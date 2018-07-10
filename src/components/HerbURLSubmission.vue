@@ -69,6 +69,8 @@
         <br>
         <br>
         <hr>
+        <pre>{{ onlineURLs }}</pre>
+        <hr>
         <pre>{{ submittingData }}</pre>
         <hr>
         <pre>{{ $data }}</pre>
@@ -77,6 +79,7 @@
 
 <script>
     import awesomplete from "awesomplete"
+    import API from '../API.js'
 
     export default {
         mounted() {
@@ -103,8 +106,17 @@
 
             this.autoComplete()
         },
+        created() {
+            API.fetchHerbImageURLs().then(fetchedData => {
+                this.onlineURLs = fetchedData
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        },
         data() {
             return {
+                onlineURLs: [],
                 labelList: [
                     "Ada",
                     "Java",
@@ -133,7 +145,7 @@
             //   checkAll: function() {
             //       return false
             //   }
-            submittingData: function() {
+            submittingData: function () {
                 let jsonData = []
                 this.rows.forEach(row => {
                     let rowData = [
