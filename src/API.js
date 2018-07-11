@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 const fetchHerbImageURLs = function () {
-    return axios.get('http://localhost:5050/herb-image-url')//https://samoonprai-api.herokuapp.com
+    return axios.get('https://samoonprai-api.herokuapp.com/herb-image-url')
         .then(response => { // flattening the response
             return response.data
             // this.fetchedData = response.data
@@ -13,7 +13,7 @@ const fetchHerbImageURLs = function () {
 }
 
 const appendHerbImageURLs = function (submittingData) {
-    return axios.post('http://localhost:5050/herb-image-url', submittingData)
+    return axios.post('https://samoonprai-api.herokuapp.com/herb-image-url', submittingData)
         .then(response => { // flattening the response
             return response
         }) // you can also make a chain.
