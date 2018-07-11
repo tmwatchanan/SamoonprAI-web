@@ -6,9 +6,9 @@
         <h1>Herb Submission</h1>
         <div id="multipleOperations">
             <!-- <input type="checkbox" @click="checkMultipleCheckboxes()"> -->
-            <button @click="addRow(-1)" class="fa fa-plus-square"> New</button>
+            <button @click="addRow(0)" class="fa fa-plus-square"> New</button>
             &nbsp;&nbsp;&nbsp;&nbsp; Change labels of checked rows to
-            <input type="text" id="multiple-labels-input" size=10 v-model="setLabel">
+            <input type="text" id="multiple-labels-input" v-model="setLabel">
             <button id="multiple-labels-btn" type="button">
                 <span class="caret"></span>
             </button>
@@ -146,21 +146,28 @@
             //       return false
             //   }
             submittingData: function () {
+                let filteredRows = this.rows.filter(function (element) {
+                    return element.url.length > 0 || element.label.length > 0
+                })
                 let jsonData = []
-                this.rows.forEach(row => {
+                filteredRows.forEach(row => {
                     let rowData = [
                         row.url,
                         row.label
                     ]
                     jsonData.push(rowData)
                 })
+                console.log(jsonData)
                 return jsonData
             }
         },
         methods: {
             addRow: function (index) {
                 try {
-                    this.rows.splice(index + 1, 0, {})
+                    this.rows.splice(index + 1, 0, {
+                        url: '',
+                        label: ''
+                    })
                     const thisComponent = this
                     this.$nextTick(() => {
                         let comboplete = new Awesomplete('input#dropdown-input-' + index, {
@@ -182,11 +189,16 @@
                     // this.autoComplete()
                 })
             },
-            submitData: function (e) {
-                let submittedData = this.rows.filter(function (element) {
-                    return element.url !== "" && element.label !== ""
+            submitData: function (e) {                
+                API.appendHerbImageURLs(this.submittingData).then(response => {
+                    if (response.status == 200) {
+
+                    }
                 })
-                console.log(submittedData)
+                .catch(error => {
+                    console.log(error)
+                })
+
                 // this.$http.post('api/outbox', {messages:this.messages})
                 // .then(function(response){
                 // 		//handle success
