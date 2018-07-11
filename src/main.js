@@ -4,8 +4,8 @@ import router from './router'
 import store from './store'
 // import './fitlers'
 
-// CSS
-require('../node_modules/awesomplete/awesomplete.css')
+// // CSS
+// require('../node_modules/awesomplete/awesomplete.css')
 
 Vue.config.productionTip = false
 

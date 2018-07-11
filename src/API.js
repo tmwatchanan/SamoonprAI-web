@@ -13,10 +13,7 @@ const fetchHerbImageURLs = function () {
 }
 
 const appendHerbImageURLs = function (submittingData) {
-    return axios.post('http://localhost:5050/herb-image-url',
-        {
-            values: submittingData
-        })
+    return axios.post('http://localhost:5050/herb-image-url', submittingData)
         .then(response => { // flattening the response
             return response
         }) // you can also make a chain.

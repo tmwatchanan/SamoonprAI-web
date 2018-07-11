@@ -6,12 +6,10 @@
         <h1>Herb Submission</h1>
         <div id="multipleOperations">
             <!-- <input type="checkbox" @click="checkMultipleCheckboxes()"> -->
-            <button @click="addRow(0)" class="fa fa-plus-square"> New</button>
+            <button @click="addRow(-1)" class="fa fa-plus-square"> New</button>
             &nbsp;&nbsp;&nbsp;&nbsp; Change labels of checked rows to
-            <input type="text" id="multiple-labels-input" v-model="setLabel">
-            <button id="multiple-labels-btn" type="button">
-                <span class="caret"></span>
-            </button>
+            <vue-tags-input v-model.trim="tag" :tags="tags" :autocomplete-items="filteredLabelList" @tags-changed="newTags => tags = newTags"
+                :max-tags=1 :placeholder="''" class="multipleInput"></vue-tags-input>
             <button @click="setMultipleLabels()">Set Selected Rows</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <button @click="removeMultipleRows()" class="fa fa-times"> Delete Selected</button>
@@ -23,10 +21,10 @@
                 <tr>
                     <th style="width: 3%;"></th>
                     <th style="width: 1%;">No.</th>
-                    <th>Image URL</th>
+                    <th style="width: 45%;">Image URL</th>
                     <th style="width: 1%;">Image</th>
-                    <th style="width: 10%;">Label</th>
-                    <th style="width: 5%;">Remove</th>
+                    <th>Label</th>
+                    <th style="width: 1%;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -46,10 +44,9 @@
                         </a>
                     </td>
                     <td>
-                        <input :id="'dropdown-input-' + count" v-model.trim="row.label" style="width:100%;" v-on:click.stop>
-                        <!-- <button :id="'dropdown-btn-' + count" type="button">
-                        <span class="caret"></span>
-                    </button> -->
+                        <!-- <input :id="'dropdown-input-' + count" v-model.trim="row.label" style="width:100%;" v-on:click.stop> -->
+                        <vue-tags-input v-model.trim="row.label" :tags="row.tags" :autocomplete-items="filteredLabelList" @tags-changed="newTags => row.tags = newTags"
+                            :max-tags=1 :placeholder="''" v-on:click.stop></vue-tags-input>
                     </td>
                     <td>
                         <!-- <button class="btn btn-primary btn-xs" @click="addRow(count)">add row</button> -->
@@ -69,96 +66,72 @@
         <br>
         <br>
         <hr>
-        <pre>{{ onlineURLs }}</pre>
-        <hr>
-        <pre>{{ submittingData }}</pre>
-        <hr>
-        <pre>{{ $data }}</pre>
+        <pre style="background-color:snow;">{{ $data }}</pre>
     </div>
 </template>
 
 <script>
-    import awesomplete from "awesomplete"
     import API from '../API.js'
+    import VueTagsInput from '@johmun/vue-tags-input';
 
     export default {
+        components: {
+            VueTagsInput
+        },
         mounted() {
             const thisComponent = this
-            var comboplete = new Awesomplete('input#multiple-labels-input', {
-                minChars: 0,
-                list: this.labelList,
-                replace: function (text) {
-                    thisComponent.setLabel = text.value
-                }
-            })
-            Awesomplete.$('#multiple-labels-btn').addEventListener("click", function () {
-                if (comboplete.ul.childNodes.length === 0) {
-                    comboplete.minChars = 0
-                    comboplete.evaluate()
-                }
-                else if (comboplete.ul.hasAttribute('hidden')) {
-                    comboplete.open()
-                }
-                else {
-                    comboplete.close()
-                }
-            })
-
-            this.autoComplete()
         },
         created() {
-            API.fetchHerbImageURLs().then(fetchedData => {
-                this.onlineURLs = fetchedData
-            })
-            .catch(error => {
-                console.log(error)
-            })
+            // API.fetchHerbImageURLs().then(fetchedData => {
+            //     this.onlineURLs = fetchedData
+            // })
+            // .catch(error => {
+            //     console.log(error)
+            // })
         },
         data() {
             return {
+                tag: '',
+                tags: [],
                 onlineURLs: [],
                 labelList: [
-                    "Ada",
-                    "Java",
-                    "JavaScript",
-                    "Brainfuck",
-                    "LOLCODE",
-                    "Node.js",
-                    "Ruby on Rails"
+                    {
+                        text: 'Spain',
+                    },
+                    {
+                        text: 'France',
+                    },
+                    {
+                        text: 'USA',
+                    },
+                    {
+                        text: 'Germany',
+                    },
+                    {
+                        text: 'China',
+                    }
                 ],
                 rows: [
                     {
-                        url:
-                            "https://medthai.com/wp-content/uploads/2013/07/Butterfly-pea-3.jpg",
-                        label: "label1"
+                        url: 'https://medthai.com/wp-content/uploads/2013/07/Butterfly-pea-3.jpg',
+                        label: ' ',
+                        tags: [],
+                        checked: false
                     },
                     {
-                        url: "test",
-                        label: "label2"
+                        url: 'test',
+                        label: ' ',
+                        tags: [],
+                        checked: false
                     }
                 ],
-                setLabel: null,
+                setLabel: '',
                 checkAll: false
             }
         },
         computed: {
-            //   checkAll: function() {
-            //       return false
-            //   }
-            submittingData: function () {
-                let filteredRows = this.rows.filter(function (element) {
-                    return element.url.length > 0 || element.label.length > 0
-                })
-                let jsonData = []
-                filteredRows.forEach(row => {
-                    let rowData = [
-                        row.url,
-                        row.label
-                    ]
-                    jsonData.push(rowData)
-                })
-                console.log(jsonData)
-                return jsonData
+            filteredLabelList: function () {
+                return this.labelList.filter(i => new RegExp(this.tag, 'i').test(i.text))
             }
         },
         methods: {
@@ -166,38 +139,52 @@
                 try {
                     this.rows.splice(index + 1, 0, {
                         url: '',
-                        label: ''
+                        label: ' ',
+                        tags: [],
+                        checked: false
                     })
                     const thisComponent = this
-                    this.$nextTick(() => {
-                        let comboplete = new Awesomplete('input#dropdown-input-' + index, {
-                            minChars: 0,
-                            list: thisComponent.labelList,
-                            replace: function (text) {
-                                thisComponent.$set(thisComponent.rows[index], 'label', text.value)
-                            }
-                        })
+                    // this.$nextTick(() => {
+                    //     let comboplete = new Awesomplete('input#dropdown-input-' + index, {
+                    //         minChars: 0,
+                    //         list: thisComponent.labelList,
+                    //         replace: function (text) {
+                    //             thisComponent.$set(thisComponent.rows[index], 'label', text.value)
+                    //         }
+                    //     })
 
-                    })
+                    // })
                 } catch (e) {
                     console.log(e)
                 }
             },
             removeRow: function (index) {
                 this.rows.splice(index, 1)
-                this.$nextTick(() => {
-                    // this.autoComplete()
-                })
             },
-            submitData: function (e) {                
-                API.appendHerbImageURLs(this.submittingData).then(response => {
+            submitData: function (e) {
+                let submittingData = {
+                    values: []
+                }
+                for (let index = 0; index < this.rows.length; index++) {
+                    const row = this.rows[index]
+                    if (row.url.length > 0 && row.tags.length > 0) {
+                        const structuredRow = {
+                            url: row.url,
+                            label: row.tags[0].text
+                        }
+                        console.log(structuredRow)
+                        submittingData.values.push(structuredRow)
+                    }
+                }
+
+                API.appendHerbImageURLs(submittingData).then(response => {
                     if (response.status == 200) {
 
                     }
                 })
-                .catch(error => {
-                    console.log(error)
-                })
+                    .catch(error => {
+                        console.log(error)
+                    })
 
                 // this.$http.post('api/outbox', {messages:this.messages})
                 // .then(function(response){
@@ -209,22 +196,10 @@
                 // })
                 // this.submitted = true
             },
-            autoComplete: function () {
-                const thisComponent = this
-                for (let index = 0; index < this.rows.length; index++) {
-                    let comboplete = new Awesomplete('input#dropdown-input-' + index, {
-                        minChars: 0,
-                        list: thisComponent.labelList,
-                        replace: function (text) {
-                            thisComponent.$set(thisComponent.rows[index], 'label', text.value)
-                        }
-                    })
-                }
-            },
             setMultipleLabels: function () {
                 this.rows.forEach(row => {
                     if (row.checked) {
-                        this.$set(row, 'label', this.setLabel)
+                        this.$set(row, 'tags', this.tags)
                     }
                 })
             },
@@ -277,4 +252,10 @@
     #multipleOperations {
         text-align: left;
     }
+
+    .multipleInput {
+        display: inline-block;
+        margin: 0 5px 0 5px;
+    }
+
 </style>

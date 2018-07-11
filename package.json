@@ -7,7 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "awesomplete": "^1.1.2",
+    "@johmun/vue-tags-input": "^1.5.4",
     "axios": "^0.18.0",
     "googleapis": "^27.0.0",
     "vue": "^2.5.16",
