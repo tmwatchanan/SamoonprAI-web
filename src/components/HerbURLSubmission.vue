@@ -45,7 +45,7 @@
                     </td>
                     <td>
                         <!-- <input :id="'dropdown-input-' + count" v-model.trim="row.label" style="width:100%;" v-on:click.stop> -->
-                        <vue-tags-input v-model.trim="row.label" :tags="row.tags" :autocomplete-items="filteredLabelList" @tags-changed="newTags => row.tags = newTags"
+                        <vue-tags-input v-model.trim="row.tag" :tags="row.tags" :autocomplete-items="rowsSuggestion[count].filteredLabelList" @tags-changed="newTags => row.tags = newTags"
                             :max-tags=1 :placeholder="''" v-on:click.stop></vue-tags-input>
                     </td>
                     <td>
@@ -63,16 +63,23 @@
             </tfoot>
         </table>
         <button @click.prevent="submitData" class="ink-button green">Submit</button>
+        <modal name="successful-modal" :height="260" :width="260">
+            <h2 style="text-align: center;">Successful!</h2>
+            <img src="../../static/img/successful.gif" alt="successful">
+            <br>
+        </modal>
         <br>
         <br>
         <hr>
         <pre style="background-color:snow;">{{ $data }}</pre>
+
     </div>
 </template>
 
 <script>
     import API from '../API.js'
-    import VueTagsInput from '@johmun/vue-tags-input';
+    import VueTagsInput from '@johmun/vue-tags-input'
+    import HerbList from '../../data/herbs.json'
 
     export default {
         components: {
@@ -94,44 +101,31 @@
                 tag: '',
                 tags: [],
                 onlineURLs: [],
-                labelList: [
-                    {
-                        text: 'Spain',
-                    },
-                    {
-                        text: 'France',
-                    },
-                    {
-                        text: 'USA',
-                    },
-                    {
-                        text: 'Germany',
-                    },
-                    {
-                        text: 'China',
-                    }
-                ],
+                labelList: HerbList,
                 rows: [
                     {
-                        url: 'https://medthai.com/wp-content/uploads/2013/07/Butterfly-pea-3.jpg',
-                        label: ' ',
-                        tags: [],
-                        checked: false
-                    },
-                    {
-                        url: 'test',
-                        label: ' ',
+                        url: '',
+                        tag: ' ',
                         tags: [],
                         checked: false
                     }
                 ],
-                setLabel: '',
                 checkAll: false
             }
         },
         computed: {
             filteredLabelList: function () {
                 return this.labelList.filter(i => new RegExp(this.tag, 'i').test(i.text))
+            },
+            rowsSuggestion: function () {
+                const rows = this.rows
+                let newRows = []
+                rows.forEach(row => {
+                    let newRow = row
+                    newRow.filteredLabelList = this.labelList.filter(i => new RegExp(row.tag, 'i').test(i.text))
+                    newRows.push(newRow)
+                })
+                return newRows
             }
         },
         methods: {
@@ -139,7 +133,7 @@
                 try {
                     this.rows.splice(index + 1, 0, {
                         url: '',
-                        label: ' ',
+                        tag: ' ',
                         tags: [],
                         checked: false
                     })
@@ -176,7 +170,6 @@
                         submittingData.values.push(structuredRow)
                     }
                 }
-
                 API.appendHerbImageURLs(submittingData).then(response => {
                     if (response.status == 200) {
 
@@ -185,16 +178,15 @@
                     .catch(error => {
                         console.log(error)
                     })
-
-                // this.$http.post('api/outbox', {messages:this.messages})
-                // .then(function(response){
-                // 		//handle success
-                // 		console.log(response)
-                // }).error(function(response){
-                // 		//handle error
-                // 		console.log(response)
-                // })
-                // this.submitted = true
+                this.$modal.show('successful-modal')
+                this.rows = [
+                    {
+                        url: '',
+                        tag: ' ',
+                        tags: [],
+                        checked: false
+                    }
+                ]
             },
             setMultipleLabels: function () {
                 this.rows.forEach(row => {
@@ -245,8 +237,12 @@
     }
 
     img {
-        height: 50px;
+        max-height: 100%;
+        height: auto;
         width: auto;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     #multipleOperations {
@@ -257,5 +253,4 @@
         display: inline-block;
         margin: 0 5px 0 5px;
     }
-
 </style>

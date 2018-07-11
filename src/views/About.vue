@@ -1,5 +1,5 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <a href="https://docs.google.com/spreadsheets/d/1R8NU0NDyJFTjz7p18QWYh5pSbAkdJAAtArg_s-Tnaro/edit#gid=0">SamoonprAI - Online Submission</a>
   </div>
 </template>
