@@ -19,7 +19,9 @@
         <table class="ink-table alternating hover">
             <thead>
                 <tr>
-                    <th style="width: 3%;"></th>
+                    <th style="width: 3%;">
+                        <input type="checkbox" :name="'checkbox-' + count" v-model="checkAll">
+                    </th>
                     <th style="width: 1%;">No.</th>
                     <th style="width: 45%;">Image URL</th>
                     <th style="width: 1%;">Image</th>
@@ -126,6 +128,29 @@
                     newRows.push(newRow)
                 })
                 return newRows
+            }
+        },
+        watch: {
+            checkAll: function (val) {
+                this.rows.forEach(row => {
+                    row.checked = this.checkAll
+                })
+            },
+            rows: {
+                handler: function (newValue) {
+                    let countChecked = 0
+                    for (let row of this.rows) {
+                        if (row.checked) {
+                            countChecked = countChecked + 1
+                        }
+                    }
+                    if (countChecked == 0) {
+                        this.checkAll = false
+                    } else if (countChecked == this.rows.length) {
+                        this.checkAll = true
+                    }
+                },
+                deep: true
             }
         },
         methods: {
