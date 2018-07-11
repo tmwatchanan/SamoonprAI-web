@@ -3,16 +3,17 @@
     <div class="panel-body">
         <!-- <input id="labelInput" class="dropdown-input"/> -->
 
-        <h1>Herb Submission</h1>
+        <h1>Herb Image Submission</h1>
+        <br>
         <div id="multipleOperations">
             <!-- <input type="checkbox" @click="checkMultipleCheckboxes()"> -->
-            <button @click="addRow(-1)" class="fa fa-plus-square"> New</button>
+            <button @click="addRow(-1)" class="fa fa-plus-square ink-button blue"> New</button>
             &nbsp;&nbsp;&nbsp;&nbsp; Change labels of checked rows to
             <vue-tags-input v-model.trim="tag" :tags="tags" :autocomplete-items="filteredLabelList" @tags-changed="newTags => tags = newTags"
                 :max-tags=1 :placeholder="''" class="multipleInput"></vue-tags-input>
-            <button @click="setMultipleLabels()">Set Selected Rows</button>
+            <button @click="setMultipleLabels()" class="ink-button">Set Selected Rows</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <button @click="removeMultipleRows()" class="fa fa-times"> Delete Selected</button>
+            <button @click="removeMultipleRows()" class="fa fa-times ink-button red"> Delete Selected</button>
         </div>
         <br>
 
@@ -23,9 +24,9 @@
                         <input type="checkbox" :name="'checkbox-' + count" v-model="checkAll">
                     </th>
                     <th style="width: 1%;">No.</th>
-                    <th style="width: 45%;">Image URL</th>
+                    <th>Image URL</th>
                     <th style="width: 1%;">Image</th>
-                    <th>Label</th>
+                    <th style="width: 28%;">Label</th>
                     <th style="width: 1%;"></th>
                 </tr>
             </thead>
@@ -88,7 +89,9 @@
             VueTagsInput
         },
         mounted() {
-            const thisComponent = this
+            // const thisComponent = this
+
+           this.test = window.clipboardData.getData('Text')
         },
         created() {
             // API.fetchHerbImageURLs().then(fetchedData => {
@@ -277,5 +280,6 @@
     .multipleInput {
         display: inline-block;
         margin: 0 5px 0 5px;
+        width: 28%;
     }
 </style>
